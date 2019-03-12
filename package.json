@@ -2,7 +2,9 @@
   "name": "@edenjs/shop-discord",
   "description": "nothing yet",
   "version": "1.0.0",
-  "dependencies": {},
+  "dependencies": {
+    "discord.js": "^11.4.2"
+  },
   "engines": {
     "node": ">= 8.0.0"
   },
