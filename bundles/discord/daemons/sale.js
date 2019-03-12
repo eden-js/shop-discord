@@ -58,26 +58,26 @@ class DiscordSaleDaemon extends Daemon {
       // set initial fields
       const fields = [{
         name  : 'Name',
-        value : user.name() || user.get('username') || user.get('email'),
+        value : user ? `[${user.name() || user.get('username') || user.get('email')}](https://${config.get('domain')}/admin/user/${user.get('_id').toString()}/update)` : config.get('address.name'),
       }, {
         name  : 'Amount',
-        value : `$${invoice.get('total').toFixed(2)} USD`,
+        value : `$${invoice.get('total').toFixed(2)} ${config.get('shop.currency') || 'USD'}`,
       }, {
         name  : 'Method',
         value : payment ? payment.get('method.type') : 'N/A',
       }, {
         name  : 'Discount',
-        value : `$${(invoice.get('discount') || 0).toFixed(2)} USD`,
+        value : `$${(invoice.get('discount') || 0).toFixed(2)} ${config.get('shop.currency') || 'USD'}`,
       }];
 
       // push line items
       fields.push({
         name  : 'Items',
-        short : true,
         value : (await Promise.all((await orderHelper.lines(order)).map(async (line) => {
           // return value
-          return `$${line.price.toFixed(2)} ${invoice.get('currency')} • ${line.qty.toLocaleString()} X ${line.title} (${line.sku})`;
+          return `$${line.price.toFixed(2)} ${invoice.get('currency')} • ${line.qty.toLocaleString()} X [${line.title}](https://${config.get('domain')}/admin/shop/product/${line.product}/update) (${line.sku})`;
         }))).join('\n\n'),
+        inline : true,
       });
 
       // set data
