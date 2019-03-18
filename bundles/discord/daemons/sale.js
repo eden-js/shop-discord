@@ -134,7 +134,7 @@ class DiscordSaleDaemon extends Daemon {
    */
   async sendSubscription(subscription, type, color) {
     // return no token
-    if (!config.get('discord.bot.client')) return;
+    if (!config.get('discord.bot.client') || !subscription) return;
 
     // try/catch
     try {
