@@ -49,7 +49,7 @@ class DiscordSaleDaemon extends Daemon {
       // send stats
       schedule.scheduleJob({
         hour   : 9,
-        minute : 0
+        minute : 0,
       }, this.sendStats);
     }
   }
@@ -68,15 +68,35 @@ class DiscordSaleDaemon extends Daemon {
     // try/catch
     try {
       // get models
-      const user    = await order.get('user');
-      const invoice = await order.get('invoice');
-      const payment = await Payment.where('invoice.id', invoice.get('_id').toString()).findOne();
+      const user      = await order.get('user');
+      const invoice   = await order.get('invoice');
+      const payment   = await Payment.where('invoice.id', invoice.get('_id').toString()).findOne();
+      const affiliate = await order.get('affiliate');
 
       // set initial fields
       const fields = [{
         name  : 'Name',
         value : user ? `[${user.name() || user.get('username') || user.get('email')}](https://${config.get('domain')}/admin/user/${user.get('_id').toString()}/update)` : order.get('address.name'),
-      }, {
+      }];
+
+      // check affiliate
+      if (affiliate) {
+        // set user
+        let aff = await affiliate.get('user');
+        aff = Array.isArray(aff) ? aff[0] : aff;
+
+        // push affilate
+        if (aff) {
+          // push to fields
+          fields.push({
+            name  : 'Affiliate',
+            value : `[${aff.name() || aff.get('username') || aff.get('email')}](https://${config.get('domain')}/admin/user/${aff.get('_id').toString()}/update)`,
+          });
+        }
+      }
+
+      // push more fields
+      fields.push(...([{
         name  : 'Amount',
         value : `${formatter.format((invoice.get('total') || 0), {
           code : invoice.get('currency') || config.get('shop.currency') || 'USD',
@@ -89,7 +109,7 @@ class DiscordSaleDaemon extends Daemon {
         value : `${formatter.format((invoice.get('discount') || 0), {
           code : invoice.get('currency') || config.get('shop.currency') || 'USD',
         })} ${order.get('currency') || config.get('shop.currency') || 'USD'}`,
-      }];
+      }]));
 
       // push line items
       fields.push({
