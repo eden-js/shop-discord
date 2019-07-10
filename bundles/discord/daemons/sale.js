@@ -45,7 +45,7 @@ class DiscordSaleDaemon extends Daemon {
     this.eden.on('subscription.requested', subscription => this.sendSubscription(subscription, 'Cancel Requested', 16761095));
 
     // check thread
-    if (['back', 'stats'].includes(this.eden.cluster) && parseInt(this.eden.id) === 0) {
+    if (['back', 'stats'].includes(this.eden.cluster) && parseInt(this.eden.id, 10) === 0) {
       // send stats
       schedule.scheduleJob({
         hour   : 9,
@@ -139,7 +139,7 @@ class DiscordSaleDaemon extends Daemon {
       discordHelper.channel(config.get('discord.sales.channel'), 'Order Completed', data);
     } catch (e) {
       // log error
-      console.log(e);
+      this.logger.log('error', e);
     }
   }
 
@@ -211,7 +211,7 @@ class DiscordSaleDaemon extends Daemon {
       discordHelper.channel(config.get('discord.subscription.channel') || config.get('discord.sales.channel'), `Subscription ${type}`, data);
     } catch (e) {
       // log error
-      console.log(e);
+      this.logger.log('error', e);
     }
   }
 
@@ -235,14 +235,13 @@ class DiscordSaleDaemon extends Daemon {
     await this.eden.hook('shop.stats.send', stats);
 
     // loop stats
-    for (const stat in stats) {
+    Object.keys(stats).forEach(async (stat) => {
       // set fields
       const fields = [];
 
       // loop keys in count
-      for (const key in stats[stat].count) { // eslint-disable-guard-for-in
+      Object.keys(stats[stat].count).forEach((key) => {
         // set value
-        const count = stats[stat].count[key];
         const money = (stats[stat].money || {})[key];
 
         // create field
@@ -253,7 +252,7 @@ class DiscordSaleDaemon extends Daemon {
           })}` : ''}`,
           inline : true,
         });
-      }
+      });
 
       // set data
       const data = {
@@ -267,7 +266,7 @@ class DiscordSaleDaemon extends Daemon {
 
       // send to channel
       await discordHelper.channel(config.get('discord.stats.channel') || config.get('discord.sales.channel'), '', data);
-    }
+    });
   }
 }
 
