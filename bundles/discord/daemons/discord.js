@@ -63,11 +63,15 @@ class DiscordDaemon extends Daemon {
     // await logging
     await this.logging;
 
+    console.log(this.__bot);
+
     // get guild
     this.guild = this.__bot.guilds.find((g) => {
       // get sales guild
       return g.name === config.get('discord.sales.guild');
     });
+
+    console.log(this.guild);
   }
 
   /**
@@ -110,6 +114,8 @@ class DiscordDaemon extends Daemon {
   async postChannel(channel, ...data) {
     // await logging
     await this.logging;
+
+    console.log(this.guild);
 
     // get channel
     channel = this.guild.channels.find((c) => {

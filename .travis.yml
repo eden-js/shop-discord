@@ -1,0 +1,21 @@
+language: node_js
+node_js:
+- '10'
+sudo: false
+install:
+- npm install --only=dev
+- npm ci
+before_script:
+- node node_modules/eslint/bin/eslint.js .
+script:
+- node ./edenconfig.js
+after_script:
+- npm test
+deploy:
+  provider: npm
+  email: alex@edenup.com
+  api_key:
+    secure: StLRIoEg/Bp5kqko4iNr1GlgQbbxoCLdMYnqZciIc0Xm+bK+twwG5MMao9qIKPq35b+HUuxQSOWnNsez6z7s0JYgqM7w/fWT3x9XMmbMIshH/qAACjo6atNk+SUiDaQzUgpq/N/hUFRrB9YgBM8trv5+UTF7zjSoa0roEnu6y0llGBSe5EFRllGVXMLW0ydqK1zB7dcCukxBSrF3w2iwekwbttEKk0eAbwS75mJhefZzeaFwS0xAZf6Axhy35CZvjhQ9bvnwupvxcZiB7IooiYNzLsa7psgYV0kNil7RGCLr6urYQR661bBgcKgLXG1joHG8ZfpInAR9kOteyE3eH5Dr1QW/N223rVwDq2tozpCbsm5AT28b5HbuFqjdntgP0qU8BQOGfP6e+gA+U4svqQD0aCX5sPei25W8k1nwwBBZrctv63q9l8GIVHurkrM6OeX3p6xoDHgrVbzk/avXkeqO6m5A3qKeYllQcOP5SS8OFM3/hhJpkFqc3yc2vDekev+srAFy9zkNnFEOTIz5jYLpGf9q2wLJz5/jMCyjFoh6Fz9HNFy3sDpN/UUOBGVnEZ8kRlLwkX86pOu3QnO/LrYjXNws7DVyu2gj5i4/6gKaf9eHjVHIqTwoxZDUutCLyaV5GD3m9T/17+V7da1+HSL/z4h7G25OZEVVBr3zmuI=
+  on:
+    tags: true
+    repo: eden-js/shop-discord
